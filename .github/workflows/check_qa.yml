@@ -11,13 +11,32 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          const assiners = await github.issues.listComments({
+          const vars = {
             issue_number: ${{ github.event.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
-          });
+          }
 
-          if(assiners) {
+          const data: {
+            repository: {
+              pullRequest: {
+                reviews: {
+                  nodes: {
+                    authorAssociation: CommentAuthorAssociation
+                    state: ReviewState
+                  }[]
+                }
+              }
+            }
+          } = await client.graphql(query, vars)
+
+          const reviews = data.repository.pullRequest.reviews.nodes.filter(review =>
+            collaboratorAssociation.includes(review.authorAssociation)
+          )
+
+          debug(`${reviews.length} total valid reviews`)
+
+          if(reviewers && reviewers.length) {
             const {data: comments }  = await github.issues.listComments({
               issue_number: ${{ github.event.number }},
               owner: context.repo.owner,
@@ -34,7 +53,7 @@ jobs:
                 const markeds = checks.join("").match(/x/g)
                 console.log(markeds)
 
-                if (markeds && assiners && markeds.length >= Math.round(assiners.length / 2)) {
+                if (markeds && reviewers && markeds.length >= Math.round(reviewers.length / 2)) {
                   core.setOutput('Can merge!')
                 } else {
                   core.setFailed('Cannot merge!')
