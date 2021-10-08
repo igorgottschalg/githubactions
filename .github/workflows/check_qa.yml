@@ -9,11 +9,11 @@ env:
   GO_VERSION: 1.17
 
 jobs:
-  PR-Comment:
+  check-can-mrege:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Update
+    - name: validate has QA done
       uses: actions/github-script@v2
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
@@ -27,5 +27,8 @@ jobs:
           const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
 
           if(commentQA)
-            if(!commentQA.body.match(/(\[x])|(\[ ])/gi)?.join("").match(/x/g).length > 1)
-              throw 'Parameter is not a number!';
+            const checks = (!commentQA.body.match(/(\[x])|(\[ ])/gi);
+            if(checks.length)
+              const marked = checks.join("").match(/x/g).length > 1
+              if(marked)
+                throw 'Parameter is not a number!';
