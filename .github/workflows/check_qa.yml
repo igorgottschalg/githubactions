@@ -11,7 +11,7 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          const query = `query ($name: String!, $owner: String!, $pull_number: Int!) {
+          const approvalsRequired = await github.graphql(`query ($name: String!, $owner: String!, $pull_number: Int!) {
             repository(name: $name, owner: $owner) {
               pullRequest(number: $pull_number) {
                 reviewRequests(last: 10) {
@@ -28,15 +28,12 @@ jobs:
                 }
               }
             }
-          }`;
-
-          const variables = {
+          }, {
             owner: context.repo.owner,
             name: context.repo.repo,
             pull_number: ${{ github.event.number }}
-          }
+          })
 
-          const approvalsRequired = await github.graphql(query, variables)
           const reviewers = approvalsRequired.repository.pullRequest.reviewRequests.nodes
 
           console.log(reviewers)
