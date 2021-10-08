@@ -1,20 +1,13 @@
 name: checks
 on: [pull_request, workflow_dispatch]
 
-env:
-  ACT_OWNER: ${{ github.repository_owner }}
-  ACT_REPOSITORY: ${{ github.repository }}
-  CACHED_DOCKER_IMAGES: '"node:12-buster" "node:12-buster-slim" "ubuntu:18.04" "ubuntu:latest" "alpine:3.10" "tonistiigi/binfmt:latest"'
-  CACHED_DOCKER_IMAGES_KEY: docker-images-0
-  GO_VERSION: 1.17
-
 jobs:
   check-can-mrege:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: validate has QA done
-      uses: actions/github-script@v2
+      uses: actions/github-script@v3
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
@@ -30,11 +23,12 @@ jobs:
             const checks = commentQA.body.match(/(\[x])|(\[ ])/gi)
 
             if (checks.length) {
-              const  marked = checks.join("").match(/x/g).length > 1
-              if (marked) {
-                console.log("Can merge")
+              const markeds = checks.join("").match(/x/g).length
+
+              if (markeds > 2) {
+                core.setSuccess('Can merge!')
               } else {
-                throw 'Parameter is not a number!'
+                core.setFailed('Cannot merge!')
               }
             }
           }
