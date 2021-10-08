@@ -1,20 +1,12 @@
 name: checks
 on:
   pull_request:
-    types: [opened]
-
-env:
-  ACT_OWNER: ${{ github.repository_owner }}
-  ACT_REPOSITORY: ${{ github.repository }}
-  CACHED_DOCKER_IMAGES: '"node:12-buster" "node:12-buster-slim" "ubuntu:18.04" "ubuntu:latest" "alpine:3.10" "tonistiigi/binfmt:latest"'
-  CACHED_DOCKER_IMAGES_KEY: docker-images-0
-  GO_VERSION: 1.17
+    types: [opened, reopened]
 
 jobs:
-  PR-Comment:
+  create-qa-revirews-comments:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
     - name: Create comment
       uses: actions/github-script@v2
       with:
@@ -49,7 +41,7 @@ jobs:
           const reviewers = approvalsRequired.repository.pullRequest.reviewRequests.nodes.map(r => r.requestedReviewer)
 
           const body = `Etapa de E2E Teste \n\n ${reviewers.map(reviewer => {
-              return `- [ ] ${reviewer.name} ${reviewer.email}`
+              return `- [ ] ${reviewer.name} ${reviewer.email}\n`
             })`
 
           console.log(body)
