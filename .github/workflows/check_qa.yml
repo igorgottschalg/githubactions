@@ -17,26 +17,28 @@ jobs:
             repo: context.repo.repo,
           });
 
-          const {data: comments }  = await github.issues.listComments({
-            issue_number: ${{ github.event.number }},
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-          });
+          if(assiners) {
+            const {data: comments }  = await github.issues.listComments({
+              issue_number: ${{ github.event.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
 
-          const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
+            const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
 
-          if (commentQA) {
-            const checks = commentQA.body.match(/(\[x])|(\[ ])/gi)
-            console.log(checks)
+            if (commentQA) {
+              const checks = commentQA.body.match(/(\[x])|(\[ ])/gi)
+              console.log(checks)
 
-            if (checks.length) {
-              const markeds = checks.join("").match(/x/g)
-              console.log(markeds)
+              if (checks.length) {
+                const markeds = checks.join("").match(/x/g)
+                console.log(markeds)
 
-              if (markeds && assiners && markeds.length >= Math.round(assiners.length / 2)) {
-                core.setOutput('Can merge!')
-              } else {
-                core.setFailed('Cannot merge!')
+                if (markeds && assiners && markeds.length >= Math.round(assiners.length / 2)) {
+                  core.setOutput('Can merge!')
+                } else {
+                  core.setFailed('Cannot merge!')
+                }
               }
             }
           }
