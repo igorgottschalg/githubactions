@@ -48,11 +48,15 @@ jobs:
           const approvalsRequired = await github.graphql(query, variables)
           const reviewers = approvalsRequired.repository.pullRequest.reviewRequests.nodes.map(r => r.requestedReviewer)
 
+          const body = `Etapa de E2E Teste \n\n ${reviewers.map(reviewer => {
+              return `- [ ] ${reviewer.name} ${reviewer.email}`
+            })`
+
+          console.log(body)
+
           github.issues.createComment({
             issue_number: ${{ github.event.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: `Etapa de E2E Teste \n\n ${reviewers.map(reviewer => {
-              return `- [ ] ${reviewer.name} ${reviewer.email}`
-            })`
+            body
           })
