@@ -13,23 +13,23 @@ jobs:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
           const query = `query ($name: String!, $owner: String!, $pull_number: Int!) {
-              repository(name: $name, owner: $owner) {
-                pullRequest(number: $pull_number) {
-                  reviewRequests(last: 10) {
-                    nodes {
-                      requestedReviewer {
-                        ... on User {
-                          id
-                          email
-                          avatarUrl
-                          name
-                        }
+            repository(name: $name, owner: $owner) {
+              pullRequest(number: $pull_number) {
+                reviewRequests(last: 10) {
+                  nodes {
+                    requestedReviewer {
+                      ... on User {
+                        id
+                        email
+                        avatarUrl
+                        name
                       }
                     }
                   }
                 }
               }
-            }`;
+            }
+          }`;
 
           const variables = {
             owner: context.repo.owner,
@@ -46,9 +46,11 @@ jobs:
 
           console.log(body)
 
-          github.issues.createComment({
+          await github.issues.createComment({
             issue_number: ${{ github.event.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
             body
           })
+
+          core.setOutput('Done!');
