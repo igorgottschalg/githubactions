@@ -36,7 +36,7 @@ jobs:
             repo: context.repo.repo,
           });
 
-          const commentQA = list.find(comment => comment.body.includes("Etapa de E2E Teste"))
+          const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
 
           if(commentQA) {
             const number = Number(commentQA.body.split(":")[1]) + 1;
