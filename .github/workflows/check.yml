@@ -18,10 +18,11 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          list = await github.issues.listComments({
+          github.issues.createComment({
             issue_number: ${{ github.event.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
-          });
-          console.log(list);
+            body: 'Etapa de E2E Teste: 1'
+          })
+
 
