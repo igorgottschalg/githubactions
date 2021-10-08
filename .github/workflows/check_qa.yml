@@ -26,10 +26,12 @@ jobs:
 
           const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
 
-          if(commentQA) {
+          if (commentQA) {
             checks = (!commentQA.body.match(/(\[x])|(\[ ])/gi)
-            if(checks.length) {
+
+            if (checks.length) {
               marked = checks.join("").match(/x/g).length > 1
-              if(marked) throw 'Parameter is not a number!'
+              if (marked) throw 'Parameter is not a number!'
+
             }
           }
