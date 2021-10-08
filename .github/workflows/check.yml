@@ -1,5 +1,7 @@
 name: checks
-on: [pull_request, workflow_dispatch]
+on:
+  pull_request:
+    types: [opened]
 
 env:
   ACT_OWNER: ${{ github.repository_owner }}
@@ -13,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: PR Comment
+    - name: Create comment
       uses: actions/github-script@v2
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
@@ -22,5 +24,5 @@ jobs:
             issue_number: ${{ github.event.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Comentário de teste'
+            body: 'Etapa de E2E Teste: 1'
           })
