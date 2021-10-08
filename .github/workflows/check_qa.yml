@@ -27,7 +27,7 @@ jobs:
               console.log(markeds)
 
               if (markeds && markeds.length > 2) {
-                core.setSuccess('Can merge!')
+                core.setOutput('Can merge!')
               } else {
                 core.setFailed('Cannot merge!')
               }
