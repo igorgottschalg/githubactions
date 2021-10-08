@@ -12,7 +12,7 @@ jobs:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
 
-          debug(github.event.pull_request.requested_reviewers)
+          console.info(github.event.pull_request.requested_reviewers)
 
           if(reviewers && reviewers.length) {
             const {data: comments }  = await github.issues.listComments({
