@@ -1,0 +1,56 @@
+name: checks
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  create-qa-revirews-comments:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create comment
+      uses: actions/github-script@v2
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const query = `query ($name: String!, $owner: String!, $pull_number: Int!) {
+            repository(name: $name, owner: $owner) {
+              pullRequest(number: $pull_number) {
+                reviewRequests(last: 10) {
+                  nodes {
+                    requestedReviewer {
+                      ... on User {
+                        id
+                        email
+                        avatarUrl
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }`;
+
+          const variables = {
+            owner: context.repo.owner,
+            name: context.repo.repo,
+            pull_number: ${{ github.event.number }}
+          }
+
+          const approvalsRequired = await github.graphql(query, variables)
+          const reviewers = approvalsRequired.repository.pullRequest.reviewRequests.nodes.map(r => r.requestedReviewer)
+
+          const body = `Etapa de E2E Teste \n\n ${reviewers.map(reviewer => {
+              return `- [ ] ${reviewer.name} ${reviewer.email}\n`
+            })`
+
+          console.log(body)
+
+          await github.issues.createComment({
+            issue_number: ${{ github.event.number }},
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body
+          })
+
+          core.setOutput('Done!');

@@ -1,0 +1,65 @@
+name: checks
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  check-can-mrege:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: validate has QA done
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const approvalsRequired = await github.graphql(`query ($name: String!, $owner: String!, $pull_number: Int!) {
+            repository(name: $name, owner: $owner) {
+              pullRequest(number: $pull_number) {
+                reviewRequests(last: 10) {
+                  nodes {
+                    requestedReviewer {
+                      ... on User {
+                        id
+                        email
+                        avatarUrl
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }, {
+            owner: context.repo.owner,
+            name: context.repo.repo,
+            pull_number: ${{ github.event.number }}
+          })
+
+          const reviewers = approvalsRequired.repository.pullRequest.reviewRequests.nodes
+
+          console.log(reviewers)
+
+          if(reviewers && reviewers.length) {
+            const {data: comments }  = await github.issues.listComments({
+              issue_number: ${{ github.event.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
+
+            if (commentQA) {
+              const checks = commentQA.body.match(/(\[x])|(\[ ])/gi)
+              console.log(checks)
+
+              if (checks.length) {
+                const markeds = checks.join("").match(/x/g)
+                console.log(markeds)
+
+                if (markeds && reviewers && markeds.length >= Math.round(reviewers.length / 2)) {
+                  core.setOutput('Can merge!')
+                } else {
+                  core.setFailed('Cannot merge!')
+                }
+              }
+            }
+          }
