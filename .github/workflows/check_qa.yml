@@ -37,7 +37,7 @@ jobs:
           }
 
           const approvalsRequired = await github.graphql(query, variables)
-          const reviewers = approvalsRequired.repository.pullRequest.reviewRequests.nodes.map(r => r.requestedReviewer)
+          const reviewers = approvalsRequired.repository.pullRequest.reviewRequests.nodes
 
           console.log(reviewers)
 
