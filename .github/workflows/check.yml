@@ -18,17 +18,10 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          const list =  github.rest.issues.listComments({
+          list = github.rest.issues.listComments({
             issue_number: ${{ github.event.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
-          })
-
+          });
           console.log(list);
 
-          # github.rest.issues.createComment({
-          #   issue_number: ${{ github.event.number }},
-          #   owner: context.repo.owner,
-          #   repo: context.repo.repo,
-          #   body: 'Comentário de teste'
-          # })
