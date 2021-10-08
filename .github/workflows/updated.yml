@@ -1,0 +1,34 @@
+name: checks
+on:
+  pull_request:
+    types: [opened]
+  issue_comment:
+    types: [edited]
+
+env:
+  ACT_OWNER: ${{ github.repository_owner }}
+  ACT_REPOSITORY: ${{ github.repository }}
+  CACHED_DOCKER_IMAGES: '"node:12-buster" "node:12-buster-slim" "ubuntu:18.04" "ubuntu:latest" "alpine:3.10" "tonistiigi/binfmt:latest"'
+  CACHED_DOCKER_IMAGES_KEY: docker-images-0
+  GO_VERSION: 1.17
+
+jobs:
+  pr_commented:
+    # This job only runs for pull request comments
+    name: PR comment
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Comment on PR #${{ github.event.issue.number }}"
+
+  issue_commented:
+    # This job only runs for issue comments
+    name: Issue comment
+    if: ${{ !github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Comment on issue #${{ github.event.issue.number }}"
+
+
