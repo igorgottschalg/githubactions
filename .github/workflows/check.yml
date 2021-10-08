@@ -38,12 +38,6 @@ jobs:
 
           const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
 
-          if(commentQA) {
-            github.issues.updateComment({
-              issue_number: ${{ github.event.number }},
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: commentQA.id,
-              body: "${comentQA.body} \n - [ ] TESTER 1 \n - [ ] TESTER 1 \n - [ ] TESTER 1"
-            })
-          }
+          if(commentQA)
+            if(!commentQA.body.match(/(\[x])|(\[ ])/gi).join("").match(/x/g).length > 1)
+              throw 'Parameter is not a number!';
