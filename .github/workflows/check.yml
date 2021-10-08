@@ -39,13 +39,12 @@ jobs:
           const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
 
           if(commentQA) {
-            const number = Number(commentQA.body.split(":")[1]) + 1;
             github.issues.updateComment({
               issue_number: ${{ github.event.number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: commentQA.id,
-              body: "Etapa de E2E Teste: ${number}"
+              body: "${comentQA.body} \n - [ ] TESTER 1 \n - [ ] TESTER 1 \n - [ ] TESTER 1"
             })
           }
 
