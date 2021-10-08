@@ -11,30 +11,8 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          const vars = {
-            issue_number: ${{ github.event.number }},
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-          }
 
-          const data: {
-            repository: {
-              pullRequest: {
-                reviews: {
-                  nodes: {
-                    authorAssociation: CommentAuthorAssociation
-                    state: ReviewState
-                  }[]
-                }
-              }
-            }
-          } = await client.graphql(query, vars)
-
-          const reviews = data.repository.pullRequest.reviews.nodes.filter(review =>
-            collaboratorAssociation.includes(review.authorAssociation)
-          )
-
-          debug(`${reviews.length} total valid reviews`)
+          debug(github.event.pull_request.requested_reviewers)
 
           if(reviewers && reviewers.length) {
             const {data: comments }  = await github.issues.listComments({
