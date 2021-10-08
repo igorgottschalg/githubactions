@@ -16,16 +16,15 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
           });
-
           const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
 
           if (commentQA) {
             const checks = commentQA.body.match(/(\[x])|(\[ ])/gi)
 
             if (checks.length) {
-              const markeds = checks.join("").match(/x/g).length
+              const markeds = checks.join("").match(/x/g)
 
-              if (markeds > 2) {
+              if (markeds && markeds.length > 2) {
                 core.setSuccess('Can merge!')
               } else {
                 core.setFailed('Cannot merge!')
