@@ -11,11 +11,18 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
+          const assiners = await github.issues.listComments({
+            issue_number: ${{ github.event.number }},
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+
           const {data: comments }  = await github.issues.listComments({
             issue_number: ${{ github.event.number }},
             owner: context.repo.owner,
             repo: context.repo.repo,
           });
+
           const commentQA = comments.find(comment => comment.body.includes("Etapa de E2E Teste"))
 
           if (commentQA) {
@@ -26,7 +33,7 @@ jobs:
               const markeds = checks.join("").match(/x/g)
               console.log(markeds)
 
-              if (markeds && markeds.length > 2) {
+              if (markeds && assiners && markeds.length >= Math.round(assiners.length / 2)) {
                 core.setOutput('Can merge!')
               } else {
                 core.setFailed('Cannot merge!')
