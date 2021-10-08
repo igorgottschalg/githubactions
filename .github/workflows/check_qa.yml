@@ -20,9 +20,11 @@ jobs:
 
           if (commentQA) {
             const checks = commentQA.body.match(/(\[x])|(\[ ])/gi)
+            console.log(checks)
 
             if (checks.length) {
               const markeds = checks.join("").match(/x/g)
+              console.log(markeds)
 
               if (markeds && markeds.length > 2) {
                 core.setSuccess('Can merge!')
